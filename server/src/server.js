@@ -32,8 +32,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use(express.static(path.join(__dirname, '../../client/user')));
+app.use('/admin', express.static(path.join(__dirname, '../../client/admin')));
 
 // ============================================
 // API ROUTES
@@ -60,12 +60,12 @@ app.get('/health', (req, res) => {
 
 // Public frontend
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, '../../client/user', 'index.html'));
 });
 
 // Admin dashboard
 app.get('/admin*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin', 'index.html'));
+    res.sendFile(path.join(__dirname, '../../client/admin', 'index.html'));
 });
 
 // ============================================

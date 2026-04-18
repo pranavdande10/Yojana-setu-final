@@ -1,0 +1,96 @@
+# DEPLOYMENT GUIDE FOR YOJANA-SETU (UPDATED)
+This guide explains how to deploy your segregated Node.js + SQLite + Puppeteer application for FREE.
+
+---
+CRITICAL CONSIDERATIONS FOR THIS PROJECT
+---
+1. Puppeteer (Web Crawlers): Uses headless Chrome. This requires high RAM and system dependencies that many free platforms block.
+2. SQLite Database: Uses a local `.sqlite` file. Features like Vercel or Netlify are "Serverless", which means your database file will be deleted every time their servers restart.
+3. Monorepo Structure: Your app is split into `/client` and `/server`.
+
+Because of this, we cannot use Vercel for the backend. We must use a container or VPS provider. Below are the two best free options.
+
+==================================================
+OPTION 1: RENDER.COM (Easiest, but Ephemeral)
+==================================================
+Render provides a free Web Service tier for your `/server`.
+* Note: Render's free tier spins down after 15 minutes of inactivity. When it wakes up, your SQLite database will reset to whatever was pushed to GitHub. Make sure you run your seed scripts!
+
+Step 1: Deploy to Render
+1. Go to https://render.com and sign up using your GitHub account.
+2. Click "New +" and select "Web Service".
+3. Connect your GitHub repository (`pranavdande10/Yojana-setu-final`).
+4. Apply these settings:
+   - Name: yojana-setu-backend
+   - Root Directory: `server`  <--- IMPORTANT! Set this to 'server'
+   - Runtime: Node
+   - Build Command: `npm install && npx puppeteer browsers install chrome`
+   - Start Command: `npm start`
+   - Instance Type: Free
+5. Environment Variables:
+   - Set `NODE_ENV` to `production`
+   - Set `PORT` to `10000`
+   - Set `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD` to `true`
+   - Set `PUPPETEER_EXECUTABLE_PATH` to `/usr/bin/google-chrome`
+6. Click "Create Web Service". Render will output a live URL (e.g. `https://yojana-setu-backend.onrender.com`).
+
+Note: Render will automatically serve your `/client/user` and `/client/admin` static sites through the backend routes just like locally!
+
+
+==================================================
+OPTION 2: ORACLE CLOUD "ALWAYS FREE" VPS (Best & Persistent)
+==================================================
+This is slightly more advanced but provides a permanent Linux server (up to 24GB RAM and 200GB Storage for free). No database resetting, and Puppeteer works flawlessly!
+
+Step 1: Get the Server
+1. Sign up for Oracle Cloud Free Tier.
+2. Create an "Always Free" Compute Instance (Ubuntu 22.04 shape, ARM Ampere A1).
+3. Download the SSH keys provided during setup.
+
+Step 2: Connect & Install Dependencies
+1. SSH into your server: `ssh -i <your-key.pem> ubuntu@<server-ip>`
+2. Install Node.js:
+   `curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -`
+   `sudo apt install -y nodejs`
+3. Install Puppeteer dependencies (Chrome) and Git:
+   `sudo apt install -y chromium-browser git`
+
+Step 3: Clone & Run Project
+1. Clone your repo: `git clone https://github.com/pranavdande10/Yojana-setu-final.git`
+2. `cd Yojana-setu-final/server`
+3. `npm install`
+4. Start your project using PM2:
+   `sudo npm install -g pm2`
+   `pm2 start src/server.js --name "yojana-setu"`
+   `pm2 save`
+
+Step 4: Expose to the Internet
+1. Open port 3000: `sudo iptables -I INPUT -p tcp -m tcp --dport 3000 -j ACCEPT`
+2. Go to Oracle Cloud Dashboard -> VM -> Attached VNICs -> Subnet -> Security Lists -> Add Inbound Rule (TCP, port 3000).
+3. Access your site at `http://<your-server-ip>:3000`!
+
+
+==================================================
+FRONTEND-ONLY DEPLOYMENT (Vercel / Netlify / GitHub Pages)
+==================================================
+If you want to host the Client frontends independently for faster global speeds, follow these steps. 
+Note: Since you have TWO frontends (`user` and `admin`), you will create TWO Vercel projects.
+
+Step 1: Link Frontends to your Deployed Backend
+1. Deploy your backend to Render or Oracle first, then copy the live backend URL (e.g., `https://yojana-setu-backend.onrender.com`).
+2. In your local project, open your JS files in `client/user/js/` and `client/admin/js/`.
+3. Find the line that says `const API_BASE = '/api';` 
+4. Change it to point to your live backend: `const API_BASE = 'https://yojana-setu-backend.onrender.com/api';`
+5. Save, commit, and push these changes to GitHub.
+
+Step 2: Deploy Static Sites to Vercel
+1. Go to Vercel (https://vercel.com) and link your GitHub account.
+2. Click "Add New..." -> "Project" and choose your `Yojana-setu-final` repository.
+3. To deploy the USER site, set:
+   - **Root Directory**: `client/user`
+   - Build Command: (leave empty)
+   - Install Command: (leave empty)
+4. Click "Deploy". 
+5. Repeat steps 2-4 for the ADMIN site, but set the **Root Directory** to `client/admin`.
+
+Vercel will immediately host your frontends globally!

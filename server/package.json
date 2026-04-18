@@ -1,0 +1,36 @@
+{
+  "name": "yojanasetu",
+  "version": "2.0.0",
+  "description": "Unified Government Information Portal with automated crawlers",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "create-admin": "node scripts/createAdmin.js",
+    "crawl": "node run-crawler.js",
+    "crawl:dry": "node run-crawler.js --dry-run"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.0.1",
+    "cheerio": "^1.0.0-rc.12",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "https-proxy-agent": "^7.0.6",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "node-cron": "^4.2.1",
+    "pg": "^8.11.3",
+    "puppeteer": "^24.37.2",
+    "sqlite3": "^5.0.2",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
