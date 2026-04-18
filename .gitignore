@@ -1,0 +1,17 @@
+# Node
+node_modules/
+
+# Environment
+.env
+
+# Database
+database.sqlite
+*.sqlite
+
+# Logs
+npm-debug.log*
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

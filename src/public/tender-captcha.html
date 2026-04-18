@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeM - CPPP Verification</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #123c4a;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sub-header {
+            background-color: #1a5c73;
+            color: white;
+            padding: 15px 40px;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .main-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            background-color: #fff;
+            margin: 20px auto;
+            max-width: 1000px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border: 1px solid #ddd;
+        }
+        .captcha-box {
+            padding: 30px;
+            text-align: center;
+        }
+        .captcha-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .captcha-label {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9em;
+        }
+        .required {
+            color: red;
+        }
+        .captcha-input {
+            padding: 6px;
+            border: 1px solid #ccc;
+            width: 120px;
+            font-size: 1em;
+        }
+        .nav-links {
+            font-size: 0.85em;
+            color: white;
+            display: flex;
+            gap: 15px;
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+        }
+        .captcha-image-container {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><rect width="100%" height="100%" fill="%23f0f0f0"/><text x="10" y="28" font-family="monospace" font-size="24" font-weight="bold" fill="%23555" transform="rotate(-5 20 20)">575B e</text><line x1="0" y1="10" x2="100" y2="30" stroke="rgba(0,0,0,0.2)" stroke-width="2"/><line x1="0" y1="35" x2="100" y2="15" stroke="rgba(0,0,0,0.2)" stroke-width="2"/></svg>') no-repeat center center;
+            width: 120px;
+            height: 45px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            background-size: cover;
+        }
+        .buttons {
+            margin-top: 10px;
+        }
+        .btn {
+            padding: 8px 25px;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .btn-submit {
+            background-color: #555;
+            color: white;
+            margin-right: 10px;
+        }
+        .btn-cancel {
+            background-color: #666;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .footer {
+            background-color: #123c4a;
+            color: white;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.8em;
+            margin-top: auto;
+        }
+        .footer-col {
+            max-width: 250px;
+        }
+        .footer-col h4 {
+            margin-top: 0;
+            border-bottom: 1px solid #336677;
+            padding-bottom: 5px;
+            color: #ccc;
+        }
+        .footer-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .footer-links li {
+            margin-bottom: 5px;
+        }
+        .error-msg {
+            color: red;
+            font-size: 0.8em;
+            display: none;
+            margin-top: 5px;
+        }
+        .subtitle {
+            font-size: 0.7em;
+            color: #777;
+            display: block;
+            margin-top: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 2em; color: white;">
+                <i class="fas fa-dharmachakra"></i>
+            </div>
+            <div>
+                <div style="font-weight: bold; font-size: 1.2em;">GeM - CPPP</div>
+                <div style="font-size: 0.7em; color: #ccc;">Government e Marketplace | Central Public Procurement Portal</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <a href="#"><i class="fas fa-home"></i> Home</a>
+            <a href="#">About GeM-CPPP</a>
+            <a href="#">Search Tender / Bids</a>
+        </div>
+    </div>
+    
+    <div class="sub-header">
+        Welcome to GeM-CPPP
+    </div>
+
+    <div class="main-content">
+        <div class="captcha-box">
+            <form id="captchaForm">
+                <div class="captcha-row">
+                    <div>
+                        <div class="captcha-label">What code is in the image?<span class="required">*</span></div>
+                        <span class="subtitle">Enter the characters shown in the image.</span>
+                    </div>
+                    <div>
+                        <input type="text" class="captcha-input" id="captchaInput" autocomplete="off" required>
+                        <div class="error-msg" id="errorMsg">Invalid Captcha. Please enter 575Be</div>
+                    </div>
+                    <div class="captcha-image-container"></div>
+                </div>
+                <div class="buttons">
+                    <button type="submit" class="btn btn-submit">Submit</button>
+                    <button type="button" class="btn btn-cancel" onclick="window.close()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-col">
+            <div style="font-size: 2.5em; font-weight: bold; margin-bottom: 10px;">NIC</div>
+            <p>This site is designed, hosted and maintained by National Informatics Centre (NIC), in association with Procurement Policy Division, Dept. of Expenditure, Ministry of Finance.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Contact Us</h4>
+            <ul class="footer-links">
+                <li><i class="fas fa-phone"></i> +91 0120-4001002</li>
+                <li><i class="fas fa-envelope"></i> cppp-doe[at]nic[dot]in</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Resources</h4>
+            <ul class="footer-links">
+                <li>About Portal</li>
+                <li>Feedback</li>
+                <li>Terms of Use</li>
+                <li>Downloads</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('captchaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('captchaInput').value.replace(/\s+/g, '').toLowerCase();
+            if (input === '575be') {
+                // Success! Redirect to the doc
+                const urlParams = new URLSearchParams(window.location.search);
+                const docUrl = urlParams.get('doc');
+                if (docUrl) {
+                    window.location.href = docUrl;
+                } else {
+                    alert('Error: Target document missing from URL parameters.');
+                }
+            } else {
+                // Fail
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('captchaInput').value = '';
+                document.getElementById('captchaInput').focus();
+            }
+        });
+    </script>
+</body>
+</html>

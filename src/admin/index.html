@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YojanaSetu - Admin Dashboard</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <div class="login-card">
+                <h1><i class="fas fa-shield-alt"></i> Admin Login</h1>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <div id="login-error" class="error-message"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen" class="screen">
+        <nav class="admin-nav">
+            <div class="nav-brand">
+                <i class="fas fa-landmark"></i> YojanaSetu Admin
+            </div>
+            <div class="nav-menu">
+                <a href="#" data-view="dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="#" data-view="pending"><i class="fas fa-clock"></i> Pending Reviews</a>
+                <a href="#" data-view="crawlers"><i class="fas fa-robot"></i> Crawlers</a>
+                <a href="#" data-view="logs"><i class="fas fa-history"></i> Logs</a>
+            </div>
+            <div class="nav-user">
+                <span id="admin-name"></span>
+                <button id="logout-btn" class="btn btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </nav>
+
+        <main class="admin-content">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <h2>Dashboard</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-pending">0</h3>
+                            <p>Pending Reviews</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-schemes">0</h3>
+                            <p>Approved Schemes</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-file-contract"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-tenders">0</h3>
+                            <p>Approved Tenders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-recruitments">0</h3>
+                            <p>Approved Recruitments</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="switchView('pending')">
+                        <i class="fas fa-tasks"></i> Review Pending Items
+                    </button>
+                    <button class="btn btn-secondary" onclick="triggerAllCrawlers()">
+                        <i class="fas fa-sync"></i> Run All Crawlers
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pending Reviews View -->
+            <div id="pending-view" class="view">
+                <h2>Pending Reviews</h2>
+                <div class="filters">
+                    <select id="filter-type">
+                        <option value="">All Types</option>
+                        <option value="scheme">Schemes</option>
+                        <option value="tender">Tenders</option>
+                        <option value="recruitment">Recruitments</option>
+                    </select>
+                </div>
+                <div id="pending-list" class="data-list"></div>
+            </div>
+
+            <!-- Crawlers View -->
+            <div id="crawlers-view" class="view">
+                <h2>Crawler Management</h2>
+
+                <!-- MyScheme Crawler Control Panel -->
+                <div class="crawler-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-robot"></i> MyScheme.gov.in Crawler</h3>
+                        <div class="status-indicator" id="crawler-status-indicator">
+                            <span class="status-dot idle"></span>
+                            <span class="status-text">Idle</span>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <!-- Status Section -->
+                        <div class="status-section">
+                            <div class="status-grid">
+                                <div class="status-item">
+                                    <label>Last Run</label>
+                                    <span id="last-run">Never</span>
+                                </div>
+                                <div class="status-item">
+                                    <label>Total Runs</label>
+                                    <span id="total-runs">0</span>
+                                </div>
+                                <div class="status-item">
+                                    <label>Success Rate</label>
+                                    <span id="success-rate">N/A</span>
+                                </div>
+                                <div class="status-item">
+                                    <label>Last Error</label>
+                                    <span id="last-error">None</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Section (shown when running) -->
+                        <div class="progress-section" id="progress-section" style="display: none;">
+                            <div class="progress-info">
+                                <div class="progress-stats">
+                                    <div class="stat">
+                                        <label>Current Batch</label>
+                                        <span id="current-batch">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Total Fetched</label>
+                                        <span id="total-fetched">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Success</label>
+                                        <span id="success-count" class="success">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Failed</label>
+                                        <span id="failed-count" class="error">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Duplicates</label>
+                                        <span id="duplicate-count" class="warning">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span id="progress-percentage">0%</span>
+                                    <span id="progress-detail">Ready to start</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Controls Section -->
+                        <div class="controls-section">
+                            <div class="control-group">
+                                <label for="batch-size">Batch Size</label>
+                                <select id="batch-size" class="form-control">
+                                    <option value="10">10 schemes</option>
+                                    <option value="25">25 schemes</option>
+                                    <option value="50" selected>50 schemes</option>
+                                    <option value="100">100 schemes</option>
+                                </select>
+                            </div>
+                            <div class="control-group" style="margin-left: 15px;">
+                                <label for="schemes-target-location">Search Location</label>
+                                <input type="text" id="schemes-target-location" class="form-control" placeholder="e.g., Maharashtra" style="width: 200px;">
+                            </div>
+                            <div class="control-buttons">
+                                <button id="start-crawler-btn" class="btn btn-success" onclick="startMySchemeCrawler()">
+                                    <i class="fas fa-play"></i> Start Crawler
+                                </button>
+                                <button id="pause-crawler-btn" class="btn btn-warning" onclick="pauseMySchemeCrawler()"
+                                    style="display: none;">
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                                <button id="stop-crawler-btn" class="btn btn-danger" onclick="stopMySchemeCrawler()"
+                                    style="display: none;">
+                                    <i class="fas fa-stop"></i> Stop
+                                </button>
+                                <button id="refresh-status-btn" class="btn btn-secondary"
+                                    onclick="refreshCrawlerStatus()">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job History -->
+                <div class="job-history">
+                    <h3>Recent Crawler Jobs</h3>
+                    <div class="filters">
+                        <select id="job-status-filter" onchange="loadMySchemeJobs()">
+                            <option value="">All Status</option>
+                            <option value="running">Running</option>
+                            <option value="completed">Completed</option>
+                            <option value="paused">Paused</option>
+                            <option value="stopped">Stopped</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div id="jobs-list" class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Started</th>
+                                    <th>Status</th>
+                                    <th>Batch Size</th>
+                                    <th>Fetched</th>
+                                    <th>Success</th>
+                                    <th>Failed</th>
+                                    <th>Duration</th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobs-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="jobs-pagination"></div>
+                </div>
+
+                <!-- TENDERS CRAWLER CARD -->
+                <div class="crawler-control-panel" style="margin-top: 30px;">
+                    <div class="panel-header">
+                        <h2>Tenders Crawler <span class="badge">eprocure.gov.in</span></h2>
+                        <div class="status-badge" id="tenders-crawler-status-badge">Checking Status...</div>
+                    </div>
+
+                    <div class="panel-content">
+                        <!-- Progress Section -->
+                        <div class="progress-section">
+                            <div class="progress-details">
+                                <div class="progress-stats">
+                                    <div class="stat">
+                                        <label>Current Batch</label>
+                                        <span id="tenders-current-batch">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Total Fetched</label>
+                                        <span id="tenders-total-fetched">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Success</label>
+                                        <span id="tenders-success-count" class="success">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Failed</label>
+                                        <span id="tenders-failed-count" class="error">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Duplicates</label>
+                                        <span id="tenders-duplicate-count" class="warning">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="tenders-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span id="tenders-progress-percentage">0%</span>
+                                    <span id="tenders-progress-detail">Ready to start</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Controls Section -->
+                        <div class="controls-section">
+                            <div class="control-group">
+                                <label for="tenders-batch-size">Batch Size</label>
+                                <select id="tenders-batch-size" class="form-control">
+                                    <option value="10">10 tenders</option>
+                                    <option value="25">25 tenders</option>
+                                    <option value="50" selected>50 tenders</option>
+                                    <option value="100">100 tenders</option>
+                                </select>
+                            </div>
+                            <div class="control-group" style="margin-left: 15px;">
+                                <label for="tenders-target-location">Search Location</label>
+                                <input type="text" id="tenders-target-location" class="form-control" placeholder="e.g., Maharashtra" style="width: 200px;">
+                            </div>
+                            <div class="control-buttons">
+                                <button id="tenders-start-crawler-btn" class="btn btn-success" onclick="startTendersCrawler()">
+                                    <i class="fas fa-play"></i> Start Crawler
+                                </button>
+                                <button id="tenders-pause-crawler-btn" class="btn btn-warning" onclick="pauseTendersCrawler()"
+                                    style="display: none;">
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                                <button id="tenders-stop-crawler-btn" class="btn btn-danger" onclick="stopTendersCrawler()"
+                                    style="display: none;">
+                                    <i class="fas fa-stop"></i> Stop
+                                </button>
+                                <button id="tenders-refresh-status-btn" class="btn btn-secondary"
+                                    onclick="refreshTendersCrawlerStatus()">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tenders Job History -->
+                <div class="job-history">
+                    <h3>Recent Tenders Crawler Jobs</h3>
+                    <div class="filters">
+                        <select id="tenders-job-status-filter" onchange="loadTendersJobs()">
+                            <option value="">All Status</option>
+                            <option value="running">Running</option>
+                            <option value="completed">Completed</option>
+                            <option value="paused">Paused</option>
+                            <option value="stopped">Stopped</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div id="tenders-jobs-list" class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Started</th>
+                                    <th>Status</th>
+                                    <th>Batch Size</th>
+                                    <th>Fetched</th>
+                                    <th>Success</th>
+                                    <th>Failed</th>
+                                    <th>Duration</th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tenders-jobs-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="tenders-jobs-pagination"></div>
+                </div>
+
+                <!-- RECRUITMENTS CRAWLER CARD -->
+                <div class="crawler-control-panel" style="margin-top: 30px;">
+                    <div class="panel-header">
+                        <h2>Recruitments Crawler</h2>
+                        <div class="status-badge" id="recruitments-crawler-status-badge">Checking Status...</div>
+                    </div>
+
+                    <div class="panel-content">
+                        <!-- Progress Section -->
+                        <div class="progress-section">
+                            <div class="progress-details">
+                                <div class="progress-stats">
+                                    <div class="stat">
+                                        <label>Current Batch</label>
+                                        <span id="recruitments-current-batch">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Total Fetched</label>
+                                        <span id="recruitments-total-fetched">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Success</label>
+                                        <span id="recruitments-success-count" class="success">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Failed</label>
+                                        <span id="recruitments-failed-count" class="error">0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <label>Duplicates</label>
+                                        <span id="recruitments-duplicate-count" class="warning">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="recruitments-progress-fill" style="width: 0%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span id="recruitments-progress-percentage">0%</span>
+                                    <span id="recruitments-progress-detail">Ready to start</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Controls Section -->
+                        <div class="controls-section">
+                            <div class="control-group">
+                                <label for="recruitments-batch-size">Batch Size</label>
+                                <select id="recruitments-batch-size" class="form-control">
+                                    <option value="10">10 recruitments</option>
+                                    <option value="25">25 recruitments</option>
+                                    <option value="50" selected>50 recruitments</option>
+                                    <option value="100">100 recruitments</option>
+                                </select>
+                            </div>
+                            <div class="control-group" style="margin-left: 15px;">
+                                <label for="recruitments-target-location">Search Location</label>
+                                <input type="text" id="recruitments-target-location" class="form-control" placeholder="e.g., Central" style="width: 200px;">
+                            </div>
+                            <div class="control-buttons">
+                                <button id="recruitments-start-crawler-btn" class="btn btn-success" onclick="startRecruitmentsCrawler()">
+                                    <i class="fas fa-play"></i> Start Crawler
+                                </button>
+                                <button id="recruitments-pause-crawler-btn" class="btn btn-warning" onclick="pauseRecruitmentsCrawler()"
+                                    style="display: none;">
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                                <button id="recruitments-stop-crawler-btn" class="btn btn-danger" onclick="stopRecruitmentsCrawler()"
+                                    style="display: none;">
+                                    <i class="fas fa-stop"></i> Stop
+                                </button>
+                                <button id="recruitments-refresh-status-btn" class="btn btn-secondary"
+                                    onclick="refreshRecruitmentsCrawlerStatus()">
+                                    <i class="fas fa-sync"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recruitments Job History -->
+                <div class="job-history">
+                    <h3>Recent Recruitments Crawler Jobs</h3>
+                    <div class="filters">
+                        <select id="recruitments-job-status-filter" onchange="loadRecruitmentsJobs()">
+                            <option value="">All Status</option>
+                            <option value="running">Running</option>
+                            <option value="completed">Completed</option>
+                            <option value="paused">Paused</option>
+                            <option value="stopped">Stopped</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div id="recruitments-jobs-list" class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Started</th>
+                                    <th>Status</th>
+                                    <th>Batch Size</th>
+                                    <th>Fetched</th>
+                                    <th>Success</th>
+                                    <th>Failed</th>
+                                    <th>Duration</th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recruitments-jobs-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="recruitments-jobs-pagination"></div>
+                </div>
+
+                <!-- Legacy Crawlers Section -->
+                <div class="legacy-crawlers">
+                    <h3>Legacy Crawlers</h3>
+                    <div id="sources-list" class="data-list"></div>
+                </div>
+            </div>
+
+            <!-- Logs View -->
+            <div id="logs-view" class="view">
+                <h2>Audit Logs</h2>
+                <div id="logs-list" class="data-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for reviewing items -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Review Item</h2>
+            <div id="review-content"></div>
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="approveItem()">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn btn-danger" onclick="showRejectForm()">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+            </div>
+            <div id="reject-form" style="display:none;">
+                <textarea id="reject-reason" placeholder="Rejection reason..."></textarea>
+                <button class="btn btn-danger" onclick="rejectItem()">Confirm Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>
