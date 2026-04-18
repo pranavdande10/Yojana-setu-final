@@ -1,5 +1,7 @@
 // Admin Dashboard JavaScript
-const API_BASE = 'https://yojanasetu-snlk.onrender.com/api/admin';
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+    ? 'http://localhost:3000/api/admin' 
+    : 'https://yojanasetu-snlk.onrender.com/api/admin';
 let token = localStorage.getItem('admin_token');
 let currentReviewId = null;
 
