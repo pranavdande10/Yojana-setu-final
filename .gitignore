@@ -5,8 +5,7 @@ node_modules/
 .env
 
 # Database
-database.sqlite
-*.sqlite
+# database.sqlite allowed so it uploads to Render
 
 # Logs
 npm-debug.log*

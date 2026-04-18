@@ -13,7 +13,7 @@ async function fixAdminPassword() {
 
         // Update or insert admin with correct hash
         await query(
-            `INSERT INTO admins (email, password_hash, name, role)
+            `INSERT INTO admins (email, password_hash, username, role)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (email) 
        DO UPDATE SET password_hash = $2`,
