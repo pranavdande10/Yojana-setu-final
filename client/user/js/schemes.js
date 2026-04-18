@@ -1,7 +1,7 @@
 // Enhanced Schemes Browsing - Phase 4
 // Handles scheme loading, filtering, search, expandable cards, and eligibility checking
 
-const API_BASE = '/api';
+const API_BASE = 'https://yojanasetu-snlk.onrender.com/api';
 let currentFilters = {};
 let currentPage = 1;
 let searchDebounceTimer = null;

@@ -1,5 +1,5 @@
 // Admin Dashboard JavaScript
-const API_BASE = '/api/admin';
+const API_BASE = 'https://yojanasetu-snlk.onrender.com/api/admin';
 let token = localStorage.getItem('admin_token');
 let currentReviewId = null;
 
