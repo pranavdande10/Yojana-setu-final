@@ -3,7 +3,7 @@
 
 const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
     ? 'http://localhost:3000/api' 
-    : 'https://yojanasetu-snlk.onrender.com/api';
+    : 'https://yojana-setu-backend.onrender.com/api';
 let currentFilters = {};
 let currentPage = 1;
 let searchDebounceTimer = null;

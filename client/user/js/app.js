@@ -224,7 +224,7 @@ function init() {
 
 async function loadStats() {
     try {
-        const response = await fetch('/api/stats');
+        const response = await fetch('https://yojana-setu-backend.onrender.com/api/stats');
         const data = await response.json();
         if (data.success) {
             document.getElementById('scheme-count').innerText = `${data.schemesCount}+`;
@@ -266,7 +266,7 @@ async function loadData() {
     itemsList.innerHTML = '<div class="loading">Loading...</div>';
 
     try {
-        const url = new URL(config.api, window.location.origin);
+        const url = new URL(config.api, 'https://yojana-setu-backend.onrender.com');
         if (currentState) url.searchParams.append('state', currentState);
         if (currentSearch) url.searchParams.append('search', currentSearch);
         if (currentSort) url.searchParams.append('sort', currentSort);
